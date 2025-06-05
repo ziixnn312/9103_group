@@ -1,19 +1,22 @@
-
 let doveImg;
 let dots = [];
 
 function preload() {
-  // 加载鸽子图像（确保文件路径正确）
-  doveImg = loadImage("assets/pngtree-peace-dove-hand-drawn-bird-olive-branch-vector-illustration-png-image_6412538.png");
+  doveImg = loadImage("assets/dove-1.png");
 }
 
-
 function setup() {
-  createCanvas(800, 600);
-  pixelDensity(1);
-  doveImg.resize(600, 0); // 缩小一点以适配画布
+  createCanvas(windowWidth, windowHeight);
+  pixelDensity(1); // Accurate pixel-to-pixel mapping
+
+  doveImg.resize(600, 0);
   doveImg.loadPixels();
 
+  // Center the image
+  let xOffset = (width - doveImg.width) / 2;
+  let yOffset = (height - doveImg.height) / 2;
+
+  // Scan image and add a dot for each dark pixel
   for (let y = 0; y < doveImg.height; y += 3) {
     for (let x = 0; x < doveImg.width; x += 3) {
       let index = (x + y * doveImg.width) * 4;
@@ -21,10 +24,9 @@ function setup() {
       let g = doveImg.pixels[index + 1];
       let b = doveImg.pixels[index + 2];
 
-      // 判断是否是线条部分（越黑越保留）
       let brightness = (r + g + b) / 3;
       if (brightness < 50) {
-        dots.push(new Dot(x + 100, y + 50)); // 调整坐标偏移以居中
+        dots.push(new Dot(x + xOffset, y + yOffset));
       }
     }
   }
@@ -42,9 +44,9 @@ function draw() {
     dot.display();
   }
 
-  fill(50);
+  fill(100);
   textSize(14);
-  text("Drag the mouse to animate the dove lines!", 20, height +10);
+  text("Drag the mouse to animate the dove lines!", 20, height - 20);
 }
 
 class Dot {
@@ -57,15 +59,16 @@ class Dot {
   update(mouseVec) {
     let dir = p5.Vector.sub(this.pos, mouseVec);
     let d = dir.mag();
+
     if (d < 80 && mouseIsPressed) {
       dir.setMag(1.2);
       this.vel.add(dir);
     }
-    this.vel.mult(0.9); // friction
-    this.pos.add(this.vel);
 
-    // 回归原位
-    let back = p5.Vector.sub(this.origin, this.pos);
+    this.vel.mult(0.9);        // Apply friction
+    this.pos.add(this.vel);   // Update position
+
+    let back = p5.Vector.sub(this.origin, this.pos); // Pull back to original spot
     back.mult(0.03);
     this.pos.add(back);
   }
