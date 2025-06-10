@@ -2,7 +2,7 @@ let doveImg;
 let dots = [];
 
 function preload() {
-  doveImg = loadImage("assets/dove-1.png");
+  doveImg = loadImage("assets/pngtree-peace-dove-hand-drawn-bird-olive-branch-vector-illustration-png-image_6412538.png");
 }
 
 function setup() {
