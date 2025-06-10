@@ -2,78 +2,48 @@ let doveImg;
 let dots = [];
 
 function preload() {
-  doveImg = loadImage("assets/pngtree-peace-dove-hand-drawn-bird-olive-branch-vector-illustration-png-image_6412538.png");
+  doveImg = loadImage("assets/Pablo Picasso Dove of peace.jpg");
 }
 
 function setup() {
-  createCanvas(windowWidth, windowHeight);
-  pixelDensity(1); // Accurate pixel-to-pixel mapping
-
-  doveImg.resize(600, 0);
+  createCanvas(800, 600);
+  pixelDensity(1);
+  doveImg.resize(600, 0); // Resize to fit canvas
   doveImg.loadPixels();
 
   // Center the image
   let xOffset = (width - doveImg.width) / 2;
   let yOffset = (height - doveImg.height) / 2;
 
-  // Scan image and add a dot for each dark pixel
+  // Loop through pixels
   for (let y = 0; y < doveImg.height; y += 3) {
     for (let x = 0; x < doveImg.width; x += 3) {
-      let index = (x + y * doveImg.width) * 4;
-      let r = doveImg.pixels[index];
-      let g = doveImg.pixels[index + 1];
-      let b = doveImg.pixels[index + 2];
-
+      let idx = (x + y * doveImg.width) * 4;
+      let r = doveImg.pixels[idx];
+      let g = doveImg.pixels[idx + 1];
+      let b = doveImg.pixels[idx + 2];
       let brightness = (r + g + b) / 3;
-      if (brightness < 50) {
-        dots.push(new Dot(x + xOffset, y + yOffset));
+
+      // Only draw dots for dark pixels (outline)
+      if (brightness < 80) {
+        dots.push({ x: x + xOffset, y: y + yOffset });
       }
     }
   }
 
-  noStroke();
-  fill(0);
+  noLoop(); // Draw once, no animation needed
 }
 
 function draw() {
   background(255);
-  let mouse = createVector(mouseX, mouseY);
+  fill(0);
+  noStroke();
 
   for (let dot of dots) {
-    dot.update(mouse);
-    dot.display();
+    ellipse(dot.x, dot.y, 2.5, 2.5);
   }
 
-  fill(100);
+  fill(50);
   textSize(14);
-  text("Drag the mouse to animate the dove lines!", 20, height - 20);
-}
-
-class Dot {
-  constructor(x, y) {
-    this.origin = createVector(x, y);
-    this.pos = this.origin.copy();
-    this.vel = createVector(0, 0);
-  }
-
-  update(mouseVec) {
-    let dir = p5.Vector.sub(this.pos, mouseVec);
-    let d = dir.mag();
-
-    if (d < 80 && mouseIsPressed) {
-      dir.setMag(1.2);
-      this.vel.add(dir);
-    }
-
-    this.vel.mult(0.9);        // Apply friction
-    this.pos.add(this.vel);   // Update position
-
-    let back = p5.Vector.sub(this.origin, this.pos); // Pull back to original spot
-    back.mult(0.03);
-    this.pos.add(back);
-  }
-
-  display() {
-    ellipse(this.pos.x, this.pos.y, 2.8, 2.8);
-  }
+  text("Dove outline drawn with dots based on brightness", 20, height - 20);
 }
